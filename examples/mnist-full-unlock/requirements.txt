@@ -1,0 +1,3 @@
+git+git://github.com/koz4k/dni-pytorch.git#egg=dni-pytorch
+torch
+torchvision
