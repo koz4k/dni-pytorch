@@ -196,7 +196,7 @@ class _SyntheticGradientUpdater(torch.autograd.Function):
         # internals
         (batch_size, *_) = synthetic_gradient.size()
         grad_synthetic_gradient = (
-            2 / batch_size * (synthetic_gradient - true_gradient)
+            2 / batch_size * (synthetic_gradient - true_gradient.data)
         )
         return (true_gradient, grad_synthetic_gradient)
 
