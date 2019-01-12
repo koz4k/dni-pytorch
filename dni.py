@@ -149,7 +149,7 @@ class BackwardInterface(UnidirectionalInterface):
         """
         if self.training:
             synthetic_gradient = self.receive(trigger)
-            _Manager.backward(trigger, synthetic_gradient.data * factor)
+            _Manager.backward(trigger, synthetic_gradient.detach() * factor)
 
     def make_trigger(self, trigger):
         """Attaches a synthetic gradient update operation to `trigger`.
@@ -203,7 +203,6 @@ class _SyntheticGradientUpdater(torch.autograd.Function):
 
 class BidirectionalInterface(torch.nn.Module):
     """`Interface` for synthesizing both activations and gradients w.r.t. them.
-
     Can be used to achieve a full unlock.
 
     Args:
@@ -408,7 +407,7 @@ class _Manager:
     @classmethod
     def backward(cls, variable, gradient=None):
         if gradient is None:
-            gradient = _ones_like(variable.data)
+            gradient = torch.ones(variable.size(), device=variable.device, dtype=variable.dtype)
 
         if cls.defer_backward:
             cls.deferred_gradients.append((variable, gradient))
@@ -439,7 +438,3 @@ Args:
         to a `Tensor` of the same size as `variable`, filled with 1.
 """
 backward = _Manager.backward
-
-
-def _ones_like(tensor):
-    return tensor.new().resize_(tensor.size()).fill_(1)
